@@ -8,7 +8,7 @@ sidebar_position: 3
 你也可以单独单独使用纯色选择。
 
 ```jsx preview
-import { ColorPicker } from 'react-colors-picker';
+import { ColorPicker } from 'react-color-beauty-picker';
 import { useState } from 'react';
 
 export default function App () {

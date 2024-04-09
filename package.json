@@ -1,7 +1,7 @@
 {
-  "name": "react-colors-picker",
-  "version": "1.0.0",
-  "description": "react-colors-picker",
+  "name": "react-color-beauty-picker",
+  "version": "0.0.2",
+  "description": "react-color-beauty-picker",
   "files": [
     "esm",
     "es2017",
@@ -71,5 +71,7 @@
   "directories": {
     "doc": "docs"
   },
-  "homepage": "https://github.com/egolink0/react-colors-picker.git#readme"
+  "author": "egolink0",
+  "license": "MIT",
+  "homepage": "https://github.com/egolink0/react-color-beauty-picker.git#readme"
 }

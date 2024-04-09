@@ -7,8 +7,8 @@ export default defineConfig({
       "@ice/pkg-plugin-docusaurus",
       {
         host: "localhost",
-        title: "react-colors-picker",
-        navBarTitle: "react-colors-picker",
+        title: "react-color-beauty-picker",
+        navBarTitle: "react-color-beauty-picker",
         baseUrl: "/react-colors",
       },
     ],
