@@ -1,26 +1,26 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import ColorStopSlider from './components/ColorStopSlider';
-import type { ISTOP } from './components/ColorStopSlider';
-import Base from './Base';
-import { ColorFormat } from './utils';
-import GradientAngel from './components/GradientAngle';
-import GradientAngelRotate from './components/GradientAngleRotate';
+import * as React from "react";
+import { useState, useEffect } from "react";
+import ColorStopSlider from "./components/ColorStopSlider";
+import type { ISTOP } from "./components/ColorStopSlider";
+import Base from "./Base";
+import { ColorFormat } from "./utils";
+import GradientAngel from "./components/GradientAngle";
+import GradientAngelRotate from "./components/GradientAngleRotate";
 
 export const getDefaultLinearGradientValue = (format: ColorFormat) => {
   return {
     colorStops: [
       {
-        color: format === 'rgb' ? 'rgb(212, 22, 22)' : '#ff0000',
-        offset: 0
+        color: format === "rgb" ? "rgb(212, 22, 22)" : "#ff0000",
+        offset: 0,
       },
       {
-        color: format === 'rgb' ? 'rgb(255, 255, 255)' : '#ffffff',
-        offset: 1
-      }
+        color: format === "rgb" ? "rgb(255, 255, 255)" : "#ffffff",
+        offset: 1,
+      },
     ],
-    angle: 90
-  }
+    angle: 90,
+  };
 };
 
 const sortListByOffset = (list: ISTOP[]) => {
@@ -33,33 +33,42 @@ const sortListByOffset = (list: ISTOP[]) => {
     }
     return 0;
   });
-}
+};
 
 const handleStopOffset = (offset: number) => {
   if (offset <= 0) return 0;
   if (offset >= 1) return 1;
   return offset;
-}
+};
 
-export type LinearGradient = {
+export interface LinearGradient {
   colorStops: ISTOP[];
   angle: number;
 }
 
 type LinearGradientProps = {
-  angleType?: 'input' | 'rotate'; 
+  angleType?: "input" | "rotate";
   format?: ColorFormat;
-  type?: 'linear' | 'radial';
+  type?: "linear" | "radial";
   value?: LinearGradient;
   onChange?: (lg: LinearGradient) => void;
   defaultRotation?: number;
-}
+};
 
-export default function LinearGradient (props: LinearGradientProps) {
-  const { angleType = 'rotate', format = 'rgb', value, type = 'linear', onChange, defaultRotation = 45 } = props;
+export default function GradientColorPicker(props: LinearGradientProps) {
+  const {
+    angleType = "rotate",
+    format = "rgb",
+    value,
+    type = "linear",
+    onChange,
+    defaultRotation = 45,
+  } = props;
   const defaultValue = getDefaultLinearGradientValue(format);
   const [gradient, setGradient] = useState(defaultValue);
-  const [activeColorStop, setActiveColorStop] = useState<ISTOP>(defaultValue.colorStops[0]);
+  const [activeColorStop, setActiveColorStop] = useState<ISTOP>(
+    defaultValue.colorStops[0]
+  );
 
   const handleColorStopAdd = (stop: ISTOP) => {
     const colorStops: ISTOP[] = [...gradient.colorStops];
@@ -67,89 +76,92 @@ export default function LinearGradient (props: LinearGradientProps) {
     sortListByOffset(colorStops);
     onChange?.({
       ...gradient,
-      colorStops
+      colorStops,
     });
     setActiveColorStop(stop);
-  }
+  };
 
   const handleColorStopUpdate = (stop: ISTOP) => {
     const _stop = {
       ...stop,
-      offset: handleStopOffset(stop.offset)
-    }
+      offset: handleStopOffset(stop.offset),
+    };
     const colorStops: ISTOP[] = [...gradient.colorStops];
-    const index = gradient.colorStops.findIndex((item: ISTOP) => item === activeColorStop);
+    const index = gradient.colorStops.findIndex(
+      (item: ISTOP) => item === activeColorStop
+    );
     if (index !== -1) {
       colorStops.splice(index, 1, _stop);
       sortListByOffset(colorStops);
       onChange?.({
         ...gradient,
-        colorStops
+        colorStops,
       });
       setActiveColorStop(_stop);
     }
-  }
+  };
 
   const handleColorStopRemove = () => {
     if (gradient.colorStops.length <= 2) return;
-    const index = gradient.colorStops.findIndex((item: ISTOP) => item === activeColorStop);
+    const index = gradient.colorStops.findIndex(
+      (item: ISTOP) => item === activeColorStop
+    );
     if (index !== -1) {
       const colorStops: ISTOP[] = [...gradient.colorStops];
       colorStops.splice(index, 1);
       onChange?.({
         ...gradient,
-        colorStops
+        colorStops,
       });
     }
-  }
+  };
 
   const handleColorChange = (color: string) => {
-    const index = gradient.colorStops.findIndex((item: ISTOP) => item === activeColorStop);
+    const index = gradient.colorStops.findIndex(
+      (item: ISTOP) => item === activeColorStop
+    );
     const colorStop = {
       ...activeColorStop,
-      color
+      color,
     };
     if (index !== -1) {
       const colorStops: ISTOP[] = [...gradient.colorStops];
       colorStops.splice(index, 1, colorStop);
       onChange?.({
         ...gradient,
-        colorStops
+        colorStops,
       });
       setActiveColorStop(colorStop);
     }
-  }
+  };
 
   const handleAngleChange = (angle: number) => {
     onChange?.({
       ...gradient,
-      angle
+      angle,
     });
-  }
+  };
 
   const renderAngleInput = () => {
-    if (angleType === 'input') {
+    if (angleType === "input") {
       return (
-        <GradientAngel
-          angle={gradient?.angle}
-          onChange={handleAngleChange}
-        />
-      )
+        <GradientAngel angle={gradient?.angle} onChange={handleAngleChange} />
+      );
     }
-    if (angleType === 'rotate') {
+    if (angleType === "rotate") {
       return (
         <GradientAngelRotate
           angle={gradient?.angle}
           onChange={handleAngleChange}
           defaultRotation={defaultRotation}
         />
-      )
+      );
     }
     return null;
-  }
+  };
 
   useEffect(() => {
-    const active = gradient.colorStops.find(item => item === activeColorStop);
+    const active = gradient.colorStops.find((item) => item === activeColorStop);
     if (!active) setActiveColorStop(gradient.colorStops[0]);
   }, [gradient]);
 
@@ -177,35 +189,73 @@ export default function LinearGradient (props: LinearGradientProps) {
               onColorStopChange={setActiveColorStop}
               colorStopUpdate={handleColorStopUpdate}
             />
-            {
-              type === 'linear' ?
-              renderAngleInput()
-              : null
-            }
+            {type === "linear" ? renderAngleInput() : null}
           </div>
           <div className="rcs-stop-info">
-            <div style={{ display: 'flex', alignItems: 'center' }} title="色标偏移">
+            <div
+              style={{ display: "flex", alignItems: "center" }}
+              title="色标偏移"
+            >
               <span style={{ lineHeight: 0 }}>
-                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3861" width="14" height="14"><path d="M866.432 175.232a42.666667 42.666667 0 0 0-60.330667-60.330667l-691.2 691.2a42.666667 42.666667 0 1 0 60.330667 60.330667l691.2-691.2zM878.933333 281.6h-85.333333v85.333333h85.333333v-85.333333zM281.6 793.6h85.333333v85.333333h-85.333333v-85.333333zM878.933333 452.266667h-85.333333v85.333333h85.333333v-85.333333zM793.6 622.933333h85.333333v85.333334h-85.333333v-85.333334zM878.933333 793.6h-85.333333v85.333333h85.333333v-85.333333zM622.933333 793.6h85.333334v85.333333h-85.333334v-85.333333zM537.6 793.6h-85.333333v85.333333h85.333333v-85.333333z" fill="#707070"></path></svg>
+                <svg
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="3861"
+                  width="14"
+                  height="14"
+                >
+                  <path
+                    d="M866.432 175.232a42.666667 42.666667 0 0 0-60.330667-60.330667l-691.2 691.2a42.666667 42.666667 0 1 0 60.330667 60.330667l691.2-691.2zM878.933333 281.6h-85.333333v85.333333h85.333333v-85.333333zM281.6 793.6h85.333333v85.333333h-85.333333v-85.333333zM878.933333 452.266667h-85.333333v85.333333h85.333333v-85.333333zM793.6 622.933333h85.333333v85.333334h-85.333333v-85.333334zM878.933333 793.6h-85.333333v85.333333h85.333333v-85.333333zM622.933333 793.6h85.333334v85.333333h-85.333334v-85.333333zM537.6 793.6h-85.333333v85.333333h85.333333v-85.333333z"
+                    fill="#707070"
+                  />
+                </svg>
               </span>
-              <span style={{ lineHeight: 0, marginLeft: 2 }}>{Math.round((activeColorStop?.offset || 0) * 100)}%</span>
+              <span style={{ lineHeight: 0, marginLeft: 2 }}>
+                {Math.round((activeColorStop?.offset || 0) * 100)}%
+              </span>
             </div>
-            {
-              type === 'linear' && angleType === 'rotate' ?
-              <div style={{ display: 'flex', alignItems: 'center' }} title="渐变角度">
+            {type === "linear" && angleType === "rotate" ? (
+              <div
+                style={{ display: "flex", alignItems: "center" }}
+                title="渐变角度"
+              >
                 <span style={{ lineHeight: 0 }}>
-                  <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6894" width="14px" height="14px"><path d="M526.048 866.88c2.432-49.92-8.224-91.552-31.552-125.952-24.896-36.704-63.264-63.68-116.224-80.96L203.2 866.88H526.08z m64.064 0h338.56v64H65.344L771.52 96l48.864 41.344-398.08 470.56c54.048 21.792 96 54.144 125.12 97.056 31.008 45.664 45.12 99.936 42.656 161.856z" fill="#707070"></path></svg>
+                  <svg
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    p-id="6894"
+                    width="14px"
+                    height="14px"
+                  >
+                    <path
+                      d="M526.048 866.88c2.432-49.92-8.224-91.552-31.552-125.952-24.896-36.704-63.264-63.68-116.224-80.96L203.2 866.88H526.08z m64.064 0h338.56v64H65.344L771.52 96l48.864 41.344-398.08 470.56c54.048 21.792 96 54.144 125.12 97.056 31.008 45.664 45.12 99.936 42.656 161.856z"
+                      fill="#707070"
+                    />
+                  </svg>
                 </span>
-                <span style={{ lineHeight: 0, marginLeft: 2 }}>{gradient?.angle}°</span>
-              </div> : null
-            }
+                <span style={{ lineHeight: 0, marginLeft: 2 }}>
+                  {gradient?.angle}°
+                </span>
+              </div>
+            ) : null}
             <span className="rcs-stop-info-del" onClick={handleColorStopRemove}>
-              <svg viewBox="64 64 896 896" focusable="false" width="14px" height="14px" fill="#707070" aria-hidden="true"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"></path></svg>
+              <svg
+                viewBox="64 64 896 896"
+                focusable="false"
+                width="14px"
+                height="14px"
+                fill="#707070"
+                aria-hidden="true"
+              >
+                <path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z" />
+              </svg>
             </span>
           </div>
           {innerPanel}
         </div>
       )}
     />
-  )
+  );
 }
